@@ -20,6 +20,9 @@ use yii\imagine\Image as Imagine;
 class Thumbnailer extends Component
 {
 
+    /**
+    * Where the thumbnails are stored
+    */
     public $thumbnailsPath = '@webroot/assets/thumbnails';
     public $thumbnailsBaseUrl = null;
 
