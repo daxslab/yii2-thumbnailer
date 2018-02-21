@@ -41,7 +41,7 @@ class Thumbnailer extends Component
                     FileHelper::createDirectory(dirname($thumbnailPath));
                     file_put_contents($thumbnailPath, $imageData, true);
                     Imagine::thumbnail($thumbnailPath, $width, $height, ManipulatorInterface::THUMBNAIL_OUTBOUND)
-                        ->save($thumbnailPath, ['quality' => 60]);
+                        ->save($thumbnailPath, ['quality' => $quality]);
                 }else{
                     return $url;
                 }
