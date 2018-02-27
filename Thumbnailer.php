@@ -121,9 +121,12 @@ class Thumbnailer extends Component
             throw new InvalidParamException(Yii::t('app', '$url expects a valid URL'));
         }
 
-        $this->defaultHeight = $this->defaultHeight ?: $this->defaultWidth;
+
 
         $width = $width ?: $this->defaultWidth;
+
+        $this->defaultHeight = $this->defaultHeight ?: $width;
+
         $height = $height ?: $this->defaultHeight;
         $quality = $quality ?: $this->defaultQuality;
 

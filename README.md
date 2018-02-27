@@ -69,6 +69,9 @@ Once the extension is configured, simply use it in your views by:
 //Generates thumbnail with default values specified in the configuration
 Html::img(Yii::$app->thumbnailer->get($imageUrl));
 
+//Generates a 400px width thumbnail. The height is determined as the width because is not set. 
+Html::img(Yii::$app->thumbnailer->get($imageUrl, 400));
+
 //Generates a 400x400 pixels thumbnail and 60% quality 
 Html::img(Yii::$app->thumbnailer->get($imageUrl, 400, 400));
 
