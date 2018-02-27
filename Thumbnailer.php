@@ -35,9 +35,9 @@ class Thumbnailer extends Component
     public $defaultWidth = 300;
 
     /**
-     * @var int default height of the generated thumbnail.
+     * @var int|null default height of the generated thumbnail. If null uses the same than [[defaultWidth]]
      */
-    public $defaultHeight = 300;
+    public $defaultHeight = null;
 
     /**
      * @var int default quality of the generated thumbnail.
@@ -120,6 +120,8 @@ class Thumbnailer extends Component
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             throw new InvalidParamException(Yii::t('app', '$url expects a valid URL'));
         }
+
+        $this->defaultHeight = $this->defaultHeight ?: $this->defaultWidth;
 
         $width = $width ?: $this->defaultWidth;
         $height = $height ?: $this->defaultHeight;
