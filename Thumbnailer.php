@@ -112,6 +112,11 @@ class Thumbnailer extends Component
         $quality = null,
         $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND
     ) {
+
+        if ($url == null) {
+            return null;
+        }
+
         if (Url::isRelative($url)) {
             $host = Yii::$app->request->hostInfo;
             $url = Yii::getAlias("{$host}/{$url}");
@@ -120,8 +125,6 @@ class Thumbnailer extends Component
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             throw new InvalidParamException(Yii::t('app', '$url expects a valid URL'));
         }
-
-
 
         $width = $width ?: $this->defaultWidth;
 
@@ -144,6 +147,21 @@ class Thumbnailer extends Component
         return $this->generateThumbnail($url, $width, $height, $quality, $mode);
     }
 
+    public function getWithRatio($url, $ratio, $width = null, $quality = null)
+    {
+
+    }
+
+    public function getProportionalToWidth($url, $width = null, $quality = null)
+    {
+
+    }
+
+    public function getProportionalToHeight($url, $height = null, $quality = null)
+    {
+
+    }
+
     /**
      * Generates a thumbnail for the image specified by $url with size according to $with and $height
      *
@@ -154,7 +172,8 @@ class Thumbnailer extends Component
      * @param string|null $mode mode to create the thumbnail.
      * @return string URL of the generated thumbnail.
      */
-    protected function generateThumbnail(
+    protected
+    function generateThumbnail(
         $url,
         $width = null,
         $height = null,
