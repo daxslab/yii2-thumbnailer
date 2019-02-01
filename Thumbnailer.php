@@ -19,6 +19,7 @@ use yii\di\Instance;
 use yii\helpers\FileHelper;
 use yii\helpers\Url;
 use yii\imagine\Image as Imagine;
+use yii\caching\CacheInterface;
 
 /**
  * Image thumbnailer for Yii2.
@@ -111,7 +112,8 @@ class Thumbnailer extends Component
         $height = null,
         $quality = null,
         $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND
-    ) {
+    )
+    {
 
         if ($url == null) {
             return null;
@@ -119,7 +121,7 @@ class Thumbnailer extends Component
 
         if (Url::isRelative($url)) {
             $host = Yii::$app->request->hostInfo;
-            $url = Yii::getAlias("{$host}/{$url}");
+            $url = Yii::getAlias("{$host}{$url}");
         }
 
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
@@ -133,33 +135,27 @@ class Thumbnailer extends Component
         $height = $height ?: $this->defaultHeight;
         $quality = $quality ?: $this->defaultQuality;
 
+        $thumbnailUrl = null;
         if ($this->enableCaching) {
             $key = [$url, $width, $height, $quality];
             $thumbnailUrl = $this->cache->get($key);
-            if ($thumbnailUrl == false) {
+            if (!$thumbnailUrl) {
                 $thumbnailUrl = $this->generateThumbnail($url, $width, $height, $quality, $mode);
-                $this->cache->set($key, $thumbnailUrl, $this->cachingDuration);
+                if ($thumbnailUrl) {
+                    $this->cache->set($key, $thumbnailUrl, $this->cachingDuration);
+                }else{
+                }
             }
-
-            return $thumbnailUrl;
+        }else{
+            $thumbnailUrl = $this->generateThumbnail($url, $width, $height, $quality, $mode);
         }
 
-        return $this->generateThumbnail($url, $width, $height, $quality, $mode);
-    }
+        if ($thumbnailUrl && Url::isRelative($thumbnailUrl)) {
+            $host = Yii::$app->request->hostInfo;
+            $thumbnailUrl = Yii::getAlias("{$host}{$thumbnailUrl}");
+        }
 
-    public function getWithRatio($url, $ratio, $width = null, $quality = null)
-    {
-
-    }
-
-    public function getProportionalToWidth($url, $width = null, $quality = null)
-    {
-
-    }
-
-    public function getProportionalToHeight($url, $height = null, $quality = null)
-    {
-
+        return $thumbnailUrl ?: $url;
     }
 
     /**
@@ -172,14 +168,14 @@ class Thumbnailer extends Component
      * @param string|null $mode mode to create the thumbnail.
      * @return string URL of the generated thumbnail.
      */
-    protected
-    function generateThumbnail(
+    protected function generateThumbnail(
         $url,
         $width = null,
         $height = null,
         $quality = null,
         $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND
-    ) {
+    )
+    {
         $filename = basename($url);
         $thumbnailPath = Yii::getAlias("$this->thumbnailsPath/{$width}x{$height}/{$filename}");
 
@@ -191,10 +187,10 @@ class Thumbnailer extends Component
                 Imagine::thumbnail($thumbnailPath, $width, $height, $mode)
                     ->save($thumbnailPath, ['quality' => $quality]);
             } else {
-                return $url;
+                return null;
             }
         } catch (Exception $e) {
-            return $url;
+            return null;
         }
 
         return Yii::getAlias(str_replace(Yii::getAlias($this->thumbnailsPath), $this->thumbnailsBaseUrl,
