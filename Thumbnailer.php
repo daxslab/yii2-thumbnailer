@@ -128,6 +128,68 @@ class Thumbnailer extends Component
             throw new InvalidParamException(Yii::t('app', '$url expects a valid URL'));
         }
 
+        return $this->getThumbnail($url,
+            $width = $width,
+            $height = $height,
+            $quality = $quality,
+            $mode = $mode);
+    }
+
+    /**
+     * Tries to load a thumbnail file from [[cache]]. If not possible, calls the thumbnail generator.
+     *
+     * @param $path @see Thumbnailer::generateThumbnail
+     * @param null $width @see Thumbnailer::generateThumbnail
+     * @param null $height @see Thumbnailer::generateThumbnail
+     * @param null $quality @see Thumbnailer::generateThumbnail
+     * @param string $mode @see Thumbnailer::generateThumbnail
+     * @return string the thumbnail URL
+     */
+    public function getFile(
+        $path,
+        $width = null,
+        $height = null,
+        $quality = null,
+        $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND
+    )
+    {
+
+        if ($path == null) {
+            return null;
+        }
+
+        $path = Yii::getAlias($path);
+
+        return $this->getThumbnail($path,
+            $width = $width,
+            $height = $height,
+            $quality = $quality,
+            $mode = $mode);
+    }
+
+    /**
+     * Tries to load a thumbnail URI from [[cache]]. If not possible, calls the thumbnail generator.
+     *
+     * @param $uri @see Thumbnailer::generateThumbnail
+     * @param null $width @see Thumbnailer::generateThumbnail
+     * @param null $height @see Thumbnailer::generateThumbnail
+     * @param null $quality @see Thumbnailer::generateThumbnail
+     * @param string $mode @see Thumbnailer::generateThumbnail
+     * @return string the thumbnail URL
+     */
+    public function getThumbnail(
+        $uri,
+        $width = null,
+        $height = null,
+        $quality = null,
+        $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND
+    )
+    {
+
+        if ($uri == null) {
+            return null;
+        }
+
         $width = $width ?: $this->defaultWidth;
 
         $this->defaultHeight = $this->defaultHeight ?: $width;
@@ -137,17 +199,17 @@ class Thumbnailer extends Component
 
         $thumbnailUrl = null;
         if ($this->enableCaching) {
-            $key = [$url, $width, $height, $quality];
+            $key = [$uri, $width, $height, $quality];
             $thumbnailUrl = $this->cache->get($key);
             if (!$thumbnailUrl) {
-                $thumbnailUrl = $this->generateThumbnail($url, $width, $height, $quality, $mode);
+                $thumbnailUrl = $this->generateThumbnail($uri, $width, $height, $quality, $mode);
                 if ($thumbnailUrl) {
                     $this->cache->set($key, $thumbnailUrl, $this->cachingDuration);
                 }else{
                 }
             }
         }else{
-            $thumbnailUrl = $this->generateThumbnail($url, $width, $height, $quality, $mode);
+            $thumbnailUrl = $this->generateThumbnail($uri, $width, $height, $quality, $mode);
         }
 
         if ($thumbnailUrl && Url::isRelative($thumbnailUrl)) {
@@ -155,7 +217,7 @@ class Thumbnailer extends Component
             $thumbnailUrl = Yii::getAlias("{$host}{$thumbnailUrl}");
         }
 
-        return $thumbnailUrl ?: $url;
+        return $thumbnailUrl ?: $uri;
     }
 
     /**
