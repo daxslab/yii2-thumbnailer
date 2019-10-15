@@ -10,10 +10,10 @@
 
 namespace daxslab\thumbnailer;
 
+use Exception;
 use Imagine\Image\ManipulatorInterface;
 use Yii;
 use yii\base\Component;
-use yii\base\Exception;
 use yii\base\InvalidParamException;
 use yii\di\Instance;
 use yii\helpers\FileHelper;
@@ -180,7 +180,7 @@ class Thumbnailer extends Component
         $thumbnailPath = Yii::getAlias("$this->thumbnailsPath/{$width}x{$height}/{$filename}");
 
         try {
-            $imageData = @file_get_contents($url);
+            $imageData = file_get_contents($url);
             if ($imageData) {
                 FileHelper::createDirectory(dirname($thumbnailPath));
                 file_put_contents($thumbnailPath, $imageData, true);
@@ -190,6 +190,7 @@ class Thumbnailer extends Component
                 return null;
             }
         } catch (Exception $e) {
+            Yii::error('THUMBNAIL ERROR: ' . $e->getMessage() .PHP_EOL.'    in '. $e->getFile() . ':' . $e->getLine());
             return null;
         }
 
