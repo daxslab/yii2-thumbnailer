@@ -136,7 +136,8 @@ class Thumbnailer extends Component
     }
 
     /**
-     * Tries to load a thumbnail file from [[cache]]. If not possible, calls the thumbnail generator.
+     * Tries to load a thumbnail file from [[cache]]. If not possible, calls the thumbnail generator for the image in
+     * $path.
      *
      * @param $path @see Thumbnailer::generateThumbnail
      * @param null $width @see Thumbnailer::generateThumbnail
@@ -145,7 +146,7 @@ class Thumbnailer extends Component
      * @param string $mode @see Thumbnailer::generateThumbnail
      * @return string the thumbnail URL
      */
-    public function getFile(
+    public function getFromFile(
         $path,
         $width = null,
         $height = null,
