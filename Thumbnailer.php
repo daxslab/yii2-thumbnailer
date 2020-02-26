@@ -111,7 +111,8 @@ class Thumbnailer extends Component
         $width = null,
         $height = null,
         $quality = null,
-        $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND
+        $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND,
+        $ignore_certificate = false
     )
     {
 
@@ -132,7 +133,8 @@ class Thumbnailer extends Component
             $width = $width,
             $height = $height,
             $quality = $quality,
-            $mode = $mode);
+            $mode = $mode,
+            $ignore_certificate);
     }
 
     /**
@@ -165,7 +167,8 @@ class Thumbnailer extends Component
             $width = $width,
             $height = $height,
             $quality = $quality,
-            $mode = $mode);
+            $mode = $mode,
+            $ignore_certificate = false);
     }
 
     /**
@@ -183,7 +186,8 @@ class Thumbnailer extends Component
         $width = null,
         $height = null,
         $quality = null,
-        $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND
+        $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND,
+        $ignore_certificate = false
     )
     {
 
@@ -203,14 +207,14 @@ class Thumbnailer extends Component
             $key = [$uri, $width, $height, $quality];
             $thumbnailUrl = $this->cache->get($key);
             if (!$thumbnailUrl) {
-                $thumbnailUrl = $this->generateThumbnail($uri, $width, $height, $quality, $mode);
+                $thumbnailUrl = $this->generateThumbnail($uri, $width, $height, $quality, $mode, $ignore_certificate);
                 if ($thumbnailUrl) {
                     $this->cache->set($key, $thumbnailUrl, $this->cachingDuration);
                 }else{
                 }
             }
         }else{
-            $thumbnailUrl = $this->generateThumbnail($uri, $width, $height, $quality, $mode);
+            $thumbnailUrl = $this->generateThumbnail($uri, $width, $height, $quality, $mode, $ignore_certificate);
         }
 
         if ($thumbnailUrl && Url::isRelative($thumbnailUrl)) {
@@ -236,14 +240,19 @@ class Thumbnailer extends Component
         $width = null,
         $height = null,
         $quality = null,
-        $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND
-    )
+        $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND,
+        $ignore_certificate = false
+        )
     {
         $filename = basename($url);
         $thumbnailPath = Yii::getAlias("$this->thumbnailsPath/{$width}x{$height}/{$filename}");
 
         try {
-            $imageData = file_get_contents($url);
+            if ($ignore_certificate){
+                $imageData = file_get_contents($url, false, stream_context_create(["ssl"=>["verify_peer"=>false,"verify_peer_name"=>false]]));
+            } else {
+                $imageData = file_get_contents($url);
+            }
             if ($imageData) {
                 FileHelper::createDirectory(dirname($thumbnailPath));
                 file_put_contents($thumbnailPath, $imageData, true);
