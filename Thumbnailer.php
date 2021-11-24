@@ -14,7 +14,7 @@ use Exception;
 use Imagine\Image\ManipulatorInterface;
 use Yii;
 use yii\base\Component;
-use yii\base\InvalidParamException;
+use yii\base\InvalidArgumentException;
 use yii\di\Instance;
 use yii\helpers\FileHelper;
 use yii\helpers\Url;
@@ -125,8 +125,11 @@ class Thumbnailer extends Component
             $url = Yii::getAlias("{$host}{$url}");
         }
 
-        if (!filter_var($url, FILTER_VALIDATE_URL)) {
-            throw new InvalidParamException(Yii::t('app', '$url expects a valid URL'));
+        $entities = array('%2F', '%3A');
+        $replacements = array("/", ':');
+        $testUrl = str_replace($entities, $replacements, urlencode($url));
+        if (!filter_var($testUrl, FILTER_VALIDATE_URL)) {
+            throw new InvalidArgumentException(Yii::t('app', $testUrl.' expects a valid URL'));
         }
 
         return $this->getThumbnail($url,
