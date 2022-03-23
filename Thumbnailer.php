@@ -248,7 +248,8 @@ class Thumbnailer extends Component
         )
     {
         $filename = basename($url);
-        $thumbnailPath = Yii::getAlias("$this->thumbnailsPath/{$width}x{$height}/{$filename}");
+        $hash = hash('crc32', $url, FALSE);
+        $thumbnailPath = Yii::getAlias("$this->thumbnailsPath/{$width}x{$height}/{$hash}-{$filename}");
 
         try {
             if ($ignore_certificate){
