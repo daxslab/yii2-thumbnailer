@@ -20,6 +20,7 @@ use yii\helpers\FileHelper;
 use yii\helpers\Url;
 use yii\imagine\Image as Imagine;
 use yii\caching\CacheInterface;
+use yii\helpers\Inflector;
 
 /**
  * Image thumbnailer for Yii2.
@@ -125,8 +126,8 @@ class Thumbnailer extends Component
             $url = Yii::getAlias("{$host}{$url}");
         }
 
-        $entities = array('%2F', '%3A', '?', '=', '&');
-        $replacements = array("/", ':', '-', '-', '-');
+        $entities = array('%2F', '%3A');
+        $replacements = array("/", ':');
         $testUrl = str_replace($entities, $replacements, urlencode($url));
         if (!filter_var($testUrl, FILTER_VALIDATE_URL)) {
             throw new InvalidArgumentException(Yii::t('app', $testUrl.' expects a valid URL'));
@@ -247,7 +248,7 @@ class Thumbnailer extends Component
         $ignore_certificate = false
         )
     {
-        $filename = basename($url);
+        $filename = uniqid(Inflector::slug(basename($url)));
         $thumbnailPath = Yii::getAlias("$this->thumbnailsPath/{$width}x{$height}/{$filename}");
 
         try {
