@@ -125,8 +125,8 @@ class Thumbnailer extends Component
             $url = Yii::getAlias("{$host}{$url}");
         }
 
-        $entities = array('%2F', '%3A');
-        $replacements = array("/", ':');
+        $entities = array('%2F', '%3A', '?', '=', '&');
+        $replacements = array("/", ':', '-', '-', '-');
         $testUrl = str_replace($entities, $replacements, urlencode($url));
         if (!filter_var($testUrl, FILTER_VALIDATE_URL)) {
             throw new InvalidArgumentException(Yii::t('app', $testUrl.' expects a valid URL'));
