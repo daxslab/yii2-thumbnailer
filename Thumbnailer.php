@@ -248,8 +248,26 @@ class Thumbnailer extends Component
         $ignore_certificate = false
         )
     {
-        $filename = uniqid(Inflector::slug(basename($url)));
-        $thumbnailPath = Yii::getAlias("$this->thumbnailsPath/{$width}x{$height}/{$filename}");
+        $urlparts = parse_url($url);
+        $hash = ($urlparts['query'] ?? null) ? ('-'.md5($urlparts['query'])) : '';
+        if($urlparts['path'] ?? null)
+        {
+            $path = $urlparts['path'];
+            $filename = pathinfo($path)['filename'] ?? null;
+            $filename = $filename ? Inflector::slug($filename) : null;
+            $extension = pathinfo($path)['extension'] ?? null;
+        }
+        if(!$filename)
+        {
+            $filename = uniqid('thumbnail-');
+        }
+        if(! $extension)
+        {
+            $contentType = FileHelper::getMimeType($url) ?: ((array_change_key_case(get_headers($uri,true))['content-type']) ?? null);
+            $extension = $contentType ? (current( FileHelper::getExtensionsByMimeType($contentType)) ?? 'jpg') : 'jpg';
+        }
+        
+        $thumbnailPath = Yii::getAlias("$this->thumbnailsPath/{$width}x{$height}/{$filename}{$hash}.{$extension}");
 
         try {
             if ($ignore_certificate){
