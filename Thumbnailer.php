@@ -21,6 +21,7 @@ use yii\helpers\Url;
 use yii\imagine\Image as Imagine;
 use yii\caching\CacheInterface;
 use yii\helpers\Inflector;
+use Mimey\MimeTypes;
 
 /**
  * Image thumbnailer for Yii2.
@@ -263,8 +264,9 @@ class Thumbnailer extends Component
         }
         if(! $extension)
         {
+            $mimes = new MimeTypes;
             $contentType = @FileHelper::getMimeType($url) ?: ((array_change_key_case(get_headers($url,true))['content-type']) ?? null);
-            $extension = $contentType ? (current( FileHelper::getExtensionsByMimeType($contentType)) ?? 'jpg') : 'jpg';
+            $extension = $contentType ? ($mimes->getExtension($contentType) ?? 'jpg') : 'jpg';
         }
         Yii::warning(['filename' => $filename, 'extension' => $extension, 'hash' => $hash, 'urlparts' => $urlparts],"Generating Thumbnail based on $url");
         $thumbnailPath = Yii::getAlias("$this->thumbnailsPath/{$width}x{$height}/{$filename}{$hash}.{$extension}");
