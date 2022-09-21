@@ -266,7 +266,7 @@ class Thumbnailer extends Component
             $contentType = @FileHelper::getMimeType($url) ?: ((array_change_key_case(get_headers($url,true))['content-type']) ?? null);
             $extension = $contentType ? (current( FileHelper::getExtensionsByMimeType($contentType)) ?? 'jpg') : 'jpg';
         }
-        
+        Yii::warning(['filename' => $filename, 'extension' => $extension, 'hash' => $hash, 'urlparts' => $urlparts],"Generating Thumbnail based on $url");
         $thumbnailPath = Yii::getAlias("$this->thumbnailsPath/{$width}x{$height}/{$filename}{$hash}.{$extension}");
 
         try {
