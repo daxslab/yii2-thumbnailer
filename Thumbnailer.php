@@ -263,7 +263,7 @@ class Thumbnailer extends Component
         }
         if(! $extension)
         {
-            $contentType = @FileHelper::getMimeType($url) ?: ((array_change_key_case(get_headers($uri,true))['content-type']) ?? null);
+            $contentType = @FileHelper::getMimeType($url) ?: ((array_change_key_case(get_headers($url,true))['content-type']) ?? null);
             $extension = $contentType ? (current( FileHelper::getExtensionsByMimeType($contentType)) ?? 'jpg') : 'jpg';
         }
         
