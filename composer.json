@@ -12,7 +12,8 @@
     ],
     "require": {
         "yiisoft/yii2": "*",
-        "yiisoft/yii2-imagine": "~2.2.0"
+        "yiisoft/yii2-imagine": "~2.2.0",
+        "ralouphie/mimey": "*"
     },
     "autoload": {
         "psr-4": {
